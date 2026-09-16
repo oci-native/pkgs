@@ -25,6 +25,7 @@ brew install --cask oci-native/pkgs/signal-desktop
 | `signal-oci` | [Signal](https://signal.org/) | OCI container | official apt pool `.deb` | x86_64 |
 | `zoom-oci` | [Zoom](https://zoom.us/) | OCI container | official `.deb` from cdn.zoom.us | x86_64 |
 | `galculator` | [Galculator](https://github.com/galculator/galculator) | OCI container | alpine package | x86_64 |
+| `realesrgan-ncnn-vulkan` | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) upscaler, plus `upscale` wrapper | native | GitHub release zip | x86_64 |
 
 Native casks unpack the vendor artifact onto the host. OCI casks build a container
 image locally on first launch and run the app in it with podman or docker, with a
