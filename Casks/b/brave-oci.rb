@@ -1,6 +1,6 @@
 cask "brave-oci" do
-  version "1.94.121"
-  sha256 "21d7ac36b64a408dc598bb6ec3db84b07b2cbca854d26b28055a2fb5b94a2e77"
+  version "1.99.55"
+  sha256 "364e954a2ad84d5ba3e0e217a229d5873c4ae7107d15e6120e4207529539c88d"
 
   # The brew-verified .deb stays in the Caskroom; the launcher bakes it
   # into a debian-based image on first run.
