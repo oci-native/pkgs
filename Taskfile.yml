@@ -28,7 +28,7 @@ tasks:
       - |
         context=$(mktemp -d)
         trap 'rm -rf "$context"' EXIT
-        cp 'containers/{{.APP}}/Containerfile' "$context/"
+        cp 'containers/{{.APP}}'/* "$context/"
         # A Containerfile that copies cask.deb gets the cask's own
         # artifact, brew-fetched and sha256-verified.
         artifact=$(grep -oEm1 '^COPY cask\.(deb|pkg)' 'containers/{{.APP}}/Containerfile' | cut -d' ' -f2 || true)

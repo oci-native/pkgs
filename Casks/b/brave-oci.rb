@@ -109,7 +109,7 @@ cask "brave-oci" do
           fi
           BUILD_DIR=$(mktemp -d)
           trap 'rm -rf "$BUILD_DIR"' EXIT
-          cp "$CONTEXT/Containerfile" "$BUILD_DIR/"
+          cp "$CONTEXT"/* "$BUILD_DIR/"
           cp "$DEB" "$BUILD_DIR/cask.deb"
           echo "$APP: building $IMAGE" >&2
           "$ENGINE" build --build-arg "APP_VERSION=$VERSION" -t "$IMAGE" "$BUILD_DIR"
@@ -141,6 +141,23 @@ cask "brave-oci" do
       fi
       if [ -e /dev/dri ]; then
         set -- --device /dev/dri "$@"
+      fi
+      # NVIDIA: the image has mesa only, which cannot drive the card, so
+      # Chromium falls back to software and WebGL is off. Pass the device
+      # nodes and bind the host's userspace driver libs over the image's
+      # lib dir (the image is Arch, same flat /usr/lib layout as the
+      # host), so they always match the loaded kernel module.
+      if [ -e /dev/nvidiactl ]; then
+        for dev in /dev/nvidia*; do
+          [ -c "$dev" ] && set -- --device "$dev" "$@"
+        done
+        for lib in /usr/lib/libEGL_nvidia.so* /usr/lib/libGLX_nvidia.so* \
+                   /usr/lib/libnvidia-eglcore.so* /usr/lib/libnvidia-glcore.so* \
+                   /usr/lib/libnvidia-glsi.so* /usr/lib/libnvidia-gpucomp.so* \
+                   /usr/lib/libnvidia-tls.so* /usr/lib/gbm/nvidia-drm_gbm.so \
+                   /usr/share/glvnd/egl_vendor.d/10_nvidia.json; do
+          [ -e "$lib" ] && set -- -v "$lib:$lib:ro" "$@"
+        done
       fi
       for dev in /dev/video*; do
         [ -e "$dev" ] && set -- --device "$dev" "$@"
