@@ -19,8 +19,13 @@ cask "brave-oci" do
   binary "oci/bin/brave-oci"
   artifact "oci/share/brave-oci.desktop",
            target: "#{Dir.home}/.local/share/applications/brave-oci.desktop"
-  artifact "opt/brave.com/brave/product_logo_256.png",
-           target: "#{Dir.home}/.local/share/icons/hicolor/256x256/apps/brave-oci.png"
+
+  # Same icon name as the native package ships, so launchers, docks and
+  # notifications resolve the real Brave logo for the brave-browser window.
+  [16, 24, 32, 48, 64, 128, 256].each do |size|
+    artifact "opt/brave.com/brave/product_logo_#{size}.png",
+             target: "#{Dir.home}/.local/share/icons/hicolor/#{size}x#{size}/apps/brave-browser.png"
+  end
 
   preflight_steps do
     run "/bin/sh",
@@ -30,7 +35,16 @@ cask "brave-oci" do
                        "cat \"$t/brave-oci/Containerfile\""],
         print_stdout: true
     run "/usr/bin/bsdtar", args: ["-xf", "brave-browser_#{version}_amd64.deb", "data.tar.xz"], chdir: "."
-    run "/usr/bin/bsdtar", args: ["-xf", "data.tar.xz", "./opt/brave.com/brave/product_logo_256.png"], chdir: "."
+    run "/usr/bin/bsdtar",
+        args:  ["-xf", "data.tar.xz",
+                "./opt/brave.com/brave/product_logo_16.png",
+                "./opt/brave.com/brave/product_logo_24.png",
+                "./opt/brave.com/brave/product_logo_32.png",
+                "./opt/brave.com/brave/product_logo_48.png",
+                "./opt/brave.com/brave/product_logo_64.png",
+                "./opt/brave.com/brave/product_logo_128.png",
+                "./opt/brave.com/brave/product_logo_256.png"],
+        chdir: "."
     mkdir_p "oci/bin"
     mkdir_p "oci/share"
     write_file "oci/bin/brave-oci", <<~SCRIPT
@@ -67,7 +81,10 @@ cask "brave-oci" do
       fi
       PULLED=""
       if ! "$ENGINE" image inspect "$IMAGE" >/dev/null 2>&1; then
-        if [ -z "${OCI_NATIVE_BUILD:-}" ]; then
+        # Without a signed digest the registry may never have this tag;
+        # reuse an earlier local build instead of waiting on failed pulls.
+        if [ -z "${OCI_NATIVE_BUILD:-}" ] && { [ -n "$DIGEST" ] ||
+          ! "$ENGINE" image inspect "localhost/oci-native/$APP:$VERSION" >/dev/null 2>&1; }; then
           echo "$APP: pulling $IMAGE" >&2
           if "$ENGINE" pull "$IMAGE"; then
             PULLED=1
@@ -156,15 +173,27 @@ cask "brave-oci" do
     set_permissions "oci/bin/brave-oci", "0755"
     write_file "oci/share/brave-oci.desktop", <<~DESKTOP
       [Desktop Entry]
+      Version=1.0
       Name=Brave (OCI)
-      Comment=Web browsing, containerized
+      GenericName=Web Browser
+      Comment=Access the Internet
       Exec={{HOMEBREW_PREFIX}}/bin/brave-oci %U
-      Terminal=false
-      Type=Application
-      Icon=brave-oci
+      StartupNotify=true
       StartupWMClass=brave-browser
-      MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
+      Terminal=false
+      Icon=brave-browser
+      Type=Application
       Categories=Network;WebBrowser;
+      MimeType=application/pdf;application/rdf+xml;application/rss+xml;application/xhtml+xml;application/xhtml_xml;application/xml;image/gif;image/jpeg;image/png;image/webp;text/html;text/xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/chromium;
+      Actions=new-window;new-private-window;
+
+      [Desktop Action new-window]
+      Name=New Window
+      Exec={{HOMEBREW_PREFIX}}/bin/brave-oci
+
+      [Desktop Action new-private-window]
+      Name=New Incognito Window
+      Exec={{HOMEBREW_PREFIX}}/bin/brave-oci --incognito
     DESKTOP
   end
 
