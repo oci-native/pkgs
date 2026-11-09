@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   renovate:
-    if: github.repository == 'oci-native/homebrew-pkgs'
+    if: github.repository == 'oci-native/pkgs'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -32,7 +32,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
-          RENOVATE_REPOSITORIES: oci-native/homebrew-pkgs
+          RENOVATE_REPOSITORIES: oci-native/pkgs
           RENOVATE_ONBOARDING: 'false'
           RENOVATE_USERNAME: github-actions[bot]
           RENOVATE_GIT_AUTHOR: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>

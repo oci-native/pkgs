@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   autobump:
-    if: github.repository == 'oci-native/homebrew-pkgs'
+    if: github.repository == 'oci-native/pkgs'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
@@ -41,7 +41,7 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Tap this repository
-        run: brew tap oci-native/pkgs https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/oci-native/homebrew-pkgs
+        run: brew tap oci-native/pkgs https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/oci-native/pkgs
 
       - name: Bump casks
         env:

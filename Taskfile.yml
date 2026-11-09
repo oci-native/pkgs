@@ -77,7 +77,7 @@ tasks:
         ref='{{.REGISTRY}}/{{.APP}}@'"$digest"
         cosign sign --yes "$ref"
         cosign verify \
-          --certificate-identity-regexp 'https://github.com/oci-native/homebrew-pkgs/' \
+          --certificate-identity-regexp 'https://github.com/oci-native/(homebrew-)?pkgs/' \
           --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
           "$ref" >/dev/null
         # Pin the signed digest in the cask; version stays as the
