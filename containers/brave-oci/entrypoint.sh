@@ -6,9 +6,19 @@
 # container and kills the new process, so the window just vanishes.
 # Run brave as a child instead and stay up until no browser process is left.
 p=x11
-[ -n "$WAYLAND_DISPLAY" ] && p=wayland
+extra=
+if [ -n "$WAYLAND_DISPLAY" ]; then
+  p=wayland
+  # Chromium's capture code (webrtc) picks the PipeWire/portal capturer only
+  # when XDG_SESSION_TYPE says wayland. The container has no login session,
+  # so the variable is unset and screen share falls back to the X11
+  # capturer on XWayland. Its X_GetImage fails with BadMatch, Xlib's default
+  # error handler calls exit(1), and the whole browser (and container) dies.
+  export XDG_SESSION_TYPE=wayland
+  extra=--enable-features=WebRTCPipeWireCapturer
+fi
 
-/opt/brave.com/brave/brave --no-sandbox --ozone-platform=$p "$@" &
+/opt/brave.com/brave/brave --no-sandbox --ozone-platform=$p $extra "$@" &
 child=$!
 
 # Print the pid of every browser process. Renderer, gpu and utility
