@@ -131,6 +131,9 @@ cask "brave-oci" do
       if [ -d "$HOME/.local/share/fonts" ]; then
         set -- -v "$HOME/.local/share/fonts:/data/.local/share/fonts:ro" "$@"
       fi
+      if [ -d "$HOME/Downloads" ]; then
+        set -- -v "$HOME/Downloads:/data/Downloads" "$@"
+      fi
       if [ -d "$HOME/.fonts" ]; then
         set -- -v "$HOME/.fonts:/data/.fonts:ro" "$@"
       fi
