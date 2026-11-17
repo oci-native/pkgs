@@ -25,7 +25,9 @@ child=$!
 # children carry --type= and exit together with their browser.
 browser_pids() {
   for f in /proc/[0-9]*/cmdline; do
-    c=$(tr '\0' ' ' <"$f" 2>/dev/null) || continue
+    # The group carries the redirect: a pid can vanish after the glob, and
+    # the shell prints that failure itself, outside tr's 2>/dev/null.
+    c=$({ tr '\0' ' ' <"$f"; } 2>/dev/null) || continue
     case "$c" in
       /opt/brave.com/brave/brave\ *--type=*) ;;
       /opt/brave.com/brave/brave\ *) pid=${f#/proc/}; echo "${pid%/cmdline}" ;;
