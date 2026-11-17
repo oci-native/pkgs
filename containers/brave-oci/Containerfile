@@ -12,7 +12,7 @@ COPY cask.deb /tmp/cask.deb
 # instead of installing, since there is no apt here.
 RUN pacman -Syu --noconfirm \
     && pacman -S --noconfirm --needed \
-       alsa-lib gtk3 libcups libxss libxtst nss xdg-utils \
+       alsa-lib gtk3 libcups libxss libxtst nss xdg-utils xdg-user-dirs \
        ttf-dejavu ttf-liberation mesa libva libpulse libxkbcommon libpipewire \
     && bsdtar -xOf /tmp/cask.deb data.tar.xz | bsdtar -xf - -C / \
     && rm /tmp/cask.deb \
