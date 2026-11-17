@@ -13,7 +13,7 @@ COPY cask.deb /tmp/cask.deb
 RUN pacman -Syu --noconfirm \
     && pacman -S --noconfirm --needed \
        alsa-lib gtk3 libcups libxss libxtst nss xdg-utils \
-       ttf-dejavu ttf-liberation mesa libva libpulse libxkbcommon libpipewire \
+       ttf-dejavu ttf-liberation mesa libva libpulse libxkbcommon pipewire \
     && bsdtar -xOf /tmp/cask.deb data.tar.xz | bsdtar -xf - -C / \
     && rm /tmp/cask.deb \
     && pacman -Scc --noconfirm
