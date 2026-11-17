@@ -117,6 +117,10 @@ cask "brave-oci" do
       fi
 
       mkdir -p "$STATE/.config" "$STATE/.cache"
+      # Brave finds its download dir through xdg-user-dir; without this file
+      # it resolves to the read-only root and every download fails.
+      [ -e "$STATE/.config/user-dirs.dirs" ] ||
+        echo 'XDG_DOWNLOAD_DIR="$HOME/Downloads"' > "$STATE/.config/user-dirs.dirs"
 
       set -- "$IMAGE" "$@"
       # Stable hostname lets Chromium recognise its own stale profile
