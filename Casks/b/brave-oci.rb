@@ -185,7 +185,7 @@ cask "brave-oci" do
         fi
       fi
 
-      exec "$ENGINE" run --rm --name "oci-$APP-$$" "$@"
+      exec "$ENGINE" run --rm --network host --name "oci-$APP-$$" "$@"
     SCRIPT
     set_permissions "oci/bin/brave-oci", "0755"
     write_file "oci/share/brave-oci.desktop", <<~DESKTOP
